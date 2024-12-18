@@ -1,0 +1,91 @@
+# version: '3.8'
+
+# services:
+#   flask-app:
+#     build: ./python-server
+#     ports:
+#       - "5001:5001"
+#     depends_on:
+#       - mongodb
+#     environment:
+#       MONGO_URI: mongodb://admin:supersecret@mongodb:27017/nextmeal
+
+#   mongodb:
+#     image: mongo:latest
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - mongo-data:/data/db
+#       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+#     environment:
+#       MONGO_INITDB_DATABASE: nextmeal
+#       MONGO_INITDB_ROOT_USERNAME: admin
+#       MONGO_INITDB_ROOT_PASSWORD: supersecret
+      
+
+#   mongo-express:
+#     image: mongo-express
+#     ports:
+#       - "8081:8081"
+#     environment:
+#       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+#       ME_CONFIG_MONGODB_ADMINPASSWORD: supersecret
+#       ME_CONFIG_MONGODB_SERVER: mongodb
+#       ME_CONFIG_BASICAUTH_USERNAME: admin
+#       ME_CONFIG_BASICAUTH_PASSWORD: supersecret
+
+#     depends_on:
+#       - "mongodb"
+
+#   nginx:
+#     build: ./frontend
+#     ports:
+#       - "80:80"
+#     depends_on:
+#       - flask-app
+# volumes:
+#   mongo-data:
+version: '3.8'
+
+services:
+  flask-app:
+    build: ./python-server
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mysql-db
+    environment:
+      MYSQL_HOST: mysql-db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: supersecret
+      MYSQL_DB: nextmeal
+
+  mysql-db:
+    image: mysql:latest
+    ports:
+      - "3307:3307"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: nextmeal
+
+  mysql-express:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8082:80"
+    depends_on:
+      - mysql-db
+    environment:
+      PMA_HOST: mysql-db
+      MYSQL_ROOT_PASSWORD: supersecret
+
+  nginx:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - flask-app
+
+volumes:
+  mysql-data:

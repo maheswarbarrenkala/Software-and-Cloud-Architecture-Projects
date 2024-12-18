@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  flask-app:
+    build: ./python-server
+    ports:
+      - "5001:5001"
+    environment:
+      VAULT_URL: http://your-vault-url:8200
+      VAULT_TOKEN: your-vault-token
+
+#All Databases are external and do not need to defined  as services in Docker Compose
+#You need to configure them in your Flask app using environment variables or configuration files.
